@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 
-const PAGES = [
+const BASE = import.meta.env.BASE_URL
+
+type Cat = 'burgers' | 'chicken' | 'tacos' | 'sides'
+
+const PAGES: { n: number; cat: Cat; title: string }[] = [
   { n: 3, cat: 'burgers', title: 'Les You & Les Big' },
   { n: 4, cat: 'burgers', title: 'Les Incontournables & Les Naans' },
   { n: 5, cat: 'burgers', title: 'Royal, Toast & Giant' },
@@ -46,7 +50,7 @@ const SLOGANS = [
 
 const CANAUX = ['TikTok', 'Instagram Reels', 'WhatsApp', 'Affichage campus', 'Micro-influenceurs']
 
-const img = (n) => `/images/menu/page-${String(n).padStart(2, '0')}.webp`
+const img = (n: number) => `${BASE}images/menu/page-${String(n).padStart(2, '0')}.webp`
 
 function useReveal() {
   useEffect(() => {
@@ -68,8 +72,8 @@ function useReveal() {
 }
 
 export default function App() {
-  const [filter, setFilter] = useState('all')
-  const [open, setOpen] = useState(null)
+  const [filter, setFilter] = useState<string>('all')
+  const [open, setOpen] = useState<number | null>(null)
   const [votes, setVotes] = useState({ burger: 0, chicken: 0 })
 
   useReveal()
@@ -81,13 +85,14 @@ export default function App() {
 
   const close = useCallback(() => setOpen(null), [])
   const go = useCallback(
-    (d) => setOpen((i) => (i === null ? null : (i + d + list.length) % list.length)),
+    (d: number) =>
+      setOpen((i) => (i === null ? null : (i + d + list.length) % list.length)),
     [list.length]
   )
 
   useEffect(() => {
     if (open === null) return
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close()
       if (e.key === 'ArrowRight') go(1)
       if (e.key === 'ArrowLeft') go(-1)
@@ -100,13 +105,14 @@ export default function App() {
     }
   }, [open, close, go])
 
-  const vote = (side) => setVotes((v) => ({ ...v, [side]: v[side] + 1 }))
+  const vote = (side: 'burger' | 'chicken') =>
+    setVotes((v) => ({ ...v, [side]: v[side] + 1 }))
 
   return (
     <>
       <header className="nav">
         <a href="#top" className="nav-logo">
-          <img src="/images/logo-round.png" alt="You Burgers" />
+          <img src={`${BASE}images/logo-round.png`} alt="You Burgers" />
           <span>YouFood</span>
         </a>
         <nav>
@@ -141,10 +147,22 @@ export default function App() {
           </div>
 
           <div className="hero-visual">
-            <button className="float-card left" onClick={() => { setFilter('burgers'); setOpen(0) }}>
+            <button
+              className="float-card left"
+              onClick={() => {
+                setFilter('burgers')
+                setOpen(0)
+              }}
+            >
               <img src={img(3)} alt="Les You et Les Big" />
             </button>
-            <button className="float-card right" onClick={() => { setFilter('chicken'); setOpen(0) }}>
+            <button
+              className="float-card right"
+              onClick={() => {
+                setFilter('chicken')
+                setOpen(0)
+              }}
+            >
               <img src={img(10)} alt="Crousty Thieb" />
             </button>
           </div>
@@ -157,15 +175,19 @@ export default function App() {
 
           <div className="duel">
             <button className="team team-burger" onClick={() => vote('burger')}>
-              <img src="/images/logo-burgers.png" alt="You Burgers" />
+              <img src={`${BASE}images/logo-burgers.png`} alt="You Burgers" />
               <strong>Team Burger</strong>
-              <span>{votes.burger} vote{votes.burger > 1 ? 's' : ''}</span>
+              <span>
+                {votes.burger} vote{votes.burger > 1 ? 's' : ''}
+              </span>
             </button>
             <div className="vs">VS</div>
             <button className="team team-chicken" onClick={() => vote('chicken')}>
-              <img src="/images/logo-chicken.png" alt="You Chicken" />
+              <img src={`${BASE}images/logo-chicken.png`} alt="You Chicken" />
               <strong>Team Chicken</strong>
-              <span>{votes.chicken} vote{votes.chicken > 1 ? 's' : ''}</span>
+              <span>
+                {votes.chicken} vote{votes.chicken > 1 ? 's' : ''}
+              </span>
             </button>
           </div>
 
@@ -209,7 +231,9 @@ export default function App() {
         {/* CAMPAGNE */}
         <section id="campagne" className="section">
           <h2 className="reveal">La Campagne</h2>
-          <p className="sub reveal">Concept : « Toi, ton choix ». Chacun a son camp, la marque en fait un jeu.</p>
+          <p className="sub reveal">
+            Concept : « Toi, ton choix ». Chacun a son camp, la marque en fait un jeu.
+          </p>
 
           <div className="actions">
             {ACTIONS.map((a, i) => (
@@ -224,30 +248,42 @@ export default function App() {
           <div className="chips-row reveal">
             <h4>Slogans</h4>
             {SLOGANS.map((s) => (
-              <span key={s} className="pill">{s}</span>
+              <span key={s} className="pill">
+                {s}
+              </span>
             ))}
           </div>
 
           <div className="chips-row reveal">
             <h4>Canaux</h4>
             {CANAUX.map((c) => (
-              <span key={c} className="pill dark">{c}</span>
+              <span key={c} className="pill dark">
+                {c}
+              </span>
             ))}
           </div>
         </section>
       </main>
 
       <footer className="footer">
-        <img src="/images/logo-youfood.png" alt="YouFood" />
-        <p>Projet de démonstration réalisé pour un entretien. Visuels et marques © You Burgers · You Chicken by YouFood.</p>
+        <img src={`${BASE}images/logo-youfood.png`} alt="YouFood" />
+        <p>
+          Projet de démonstration réalisé pour un entretien. Visuels et marques © You Burgers · You
+          Chicken by YouFood.
+        </p>
       </footer>
 
-      {open !== null && (
+      {open !== null && list[open] && (
         <div className="lightbox" onClick={close}>
-          <button className="lb-close" onClick={close} aria-label="Fermer">×</button>
+          <button className="lb-close" onClick={close} aria-label="Fermer">
+            ×
+          </button>
           <button
             className="lb-nav prev"
-            onClick={(e) => { e.stopPropagation(); go(-1) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              go(-1)
+            }}
             aria-label="Précédent"
           >
             ‹
@@ -259,7 +295,10 @@ export default function App() {
           />
           <button
             className="lb-nav next"
-            onClick={(e) => { e.stopPropagation(); go(1) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              go(1)
+            }}
             aria-label="Suivant"
           >
             ›
